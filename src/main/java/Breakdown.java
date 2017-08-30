@@ -4,7 +4,12 @@ import wyc.lang.WhileyFile;
 
 import java.util.*;
 
+/**
+ * Breaks down the loop invariants by separating conjunctive conditions
+ * into multiple where clauses
+ */
 public class Breakdown {
+
     private final WhileyFile file;
 
     public Breakdown(WhileyFile file) {
@@ -17,12 +22,10 @@ public class Breakdown {
         for (WhileyFile.FunctionOrMethodOrProperty functionOrMethodOrProperty :
                 file.declarations(WhileyFile.FunctionOrMethodOrProperty.class)) {
 
-
-            // go through the things
+            // search through all bodies of code
             breakdown(functionOrMethodOrProperty.statements);
         }
 
-        // then break up &&'s into separate invariant lines
 
         return this.file;
     }
@@ -37,6 +40,7 @@ public class Breakdown {
         if (stmt instanceof Stmt.While) {
             Stmt.While whileStmt = (Stmt.While) stmt;
 
+            // then break up &&'s into separate invariant lines
             handleBreakdown(whileStmt);
 
             breakdown(whileStmt.body);
@@ -75,7 +79,6 @@ public class Breakdown {
            Expr.BinOp binOp = (Expr.BinOp) expr;
 
            if (binOp.op == Expr.BOp.AND) {
-
                exprs.addAll(breakExpr(binOp.lhs));
                exprs.addAll(breakExpr(binOp.rhs));
                return exprs;

@@ -1,13 +1,8 @@
-import wyc.commands.Compile;
 import wyc.io.WhileyFilePrinter;
 import wyc.lang.WhileyFile;
-import wycc.util.Logger;
-import wyfs.lang.Content;
-import wyfs.lang.Path;
 import org.apache.commons.cli.*;
 
 import java.io.*;
-import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -54,6 +49,11 @@ public class Main {
     private static Options getOptions() {
         Options options = new Options();
 
+        options.addOption(Option.builder("count")
+                .desc("Count the number of loop invariants in the whole file")
+                .hasArg()
+                .build());
+
         options.addOption(Option.builder("breakdown")
                 .desc("Breakdown loop invariants of given file")
                 .hasArg()
@@ -76,27 +76,8 @@ public class Main {
     }
 
     private static void breakdown(String path, OutputStream result) throws IOException {
-        File whileyfile = new File(path);
-        File whileydir = new File(whileyfile.getCanonicalFile().getParent());
-
-        Content.Registry registry = new wyc.Activator.Registry();
-        Compile cmd = new Compile(registry, Logger.NULL, System.out, System.err);
-        cmd.setWhileydir(whileydir);
-        cmd.setWyaldir(whileydir);
-        cmd.setWyildir(whileydir); // fixes getModifiedSourceFiles from crashing
-
-
-        // Gets the entries to be formatted
-        List<Path.Entry<WhileyFile>> entries = cmd.getModifiedSourceFiles();
-
-        List<WhileyFile> whileyFiles = new ArrayList<>(entries.size());
-        for (Path.Entry<WhileyFile> entry : entries) {
-            WhileyFile file = WhileyFile.ContentType.read(entry, null);
-
-            // Breakdown
-            WhileyFile broke = new Breakdown(file).breakdown();
-
-            new WhileyFilePrinter(result).print(broke);
+        for (WhileyFile file : Whiley.parse(path)) {
+            new WhileyFilePrinter(result).print(new Breakdown(file).breakdown());
         }
     }
 }
