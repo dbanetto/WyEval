@@ -36,7 +36,9 @@ public class Whiley {
     }
 
     public static boolean compile(String path, boolean verify, boolean generateLoopInv) throws IOException {
-        File whileyfile = new File(path);
+       return compile(new File(path), verify, generateLoopInv);
+    }
+    public static boolean compile(File whileyfile, boolean verify, boolean generateLoopInv) throws IOException {
         File whileydir = new File(whileyfile.getCanonicalFile().getParent());
 
         Content.Registry registry = new wyc.Activator.Registry();
@@ -48,7 +50,7 @@ public class Whiley {
         cmd.setVerify(verify);
         cmd.setGenerateLoopInvariant(generateLoopInv);
 
-        Compile.Result result = cmd.execute(whileyfile.getName());
+        Compile.Result result = cmd.execute(whileyfile.getAbsolutePath());
 
         return result == Compile.Result.SUCCESS;
     }

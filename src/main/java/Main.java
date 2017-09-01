@@ -17,6 +17,8 @@ public class Main {
 
         if (cmd.hasOption("breakdown")) {
             handleBreakdown(cmd);
+        } else if (cmd.hasOption("minimize")) {
+            handleMinimize(cmd);
         } else {
             new HelpFormatter().printHelp("eval", getOptions());
         }
@@ -40,6 +42,29 @@ public class Main {
 
         try {
             breakdown(file, outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private static void handleMinimize(CommandLine cmd) {
+        String file = cmd.getOptionValue("minimize");
+
+        OutputStream outputStream = System.out;
+
+        if (cmd.hasOption("o")) {
+            File outputFile = new File(cmd.getOptionValue("o"));
+            try {
+                outputStream = new FileOutputStream(outputFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.exit(2);
+            }
+        }
+
+        try {
+            minimize(file, cmd.hasOption("loopinv"), outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -78,6 +103,13 @@ public class Main {
     private static void breakdown(String path, OutputStream result) throws IOException {
         for (WhileyFile file : Whiley.parse(path)) {
             new WhileyFilePrinter(result).print(new Breakdown(file).breakdown());
+        }
+    }
+
+
+    private static void minimize(String path, boolean generateLoopInv, OutputStream result) throws IOException {
+        for (WhileyFile file : Whiley.parse(path)) {
+            new WhileyFilePrinter(result).print(new Minimize(file, generateLoopInv).minimize());
         }
     }
 }

@@ -1,5 +1,4 @@
-function test() -> (int r)
-    ensures r == 0:
+function test() -> int:
     int i = 10
     //
     while i > 0
