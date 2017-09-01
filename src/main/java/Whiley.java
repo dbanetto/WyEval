@@ -29,7 +29,9 @@ public class Whiley {
         List<Path.Entry<WhileyFile>> entries = cmd.getModifiedSourceFiles();
         List<WhileyFile> whileyFiles = new ArrayList<>(entries.size());
         for (Path.Entry<WhileyFile> entry : entries) {
-            whileyFiles.add(WhileyFile.ContentType.read(entry, null));
+            if (entry.location().equals(whileyfile.getAbsolutePath())) {
+                whileyFiles.add(WhileyFile.ContentType.read(entry, null));
+            }
         }
 
         return whileyFiles;
@@ -38,6 +40,7 @@ public class Whiley {
     public static boolean compile(String path, boolean verify, boolean generateLoopInv) throws IOException {
        return compile(new File(path), verify, generateLoopInv);
     }
+
     public static boolean compile(File whileyfile, boolean verify, boolean generateLoopInv) throws IOException {
         File whileydir = new File(whileyfile.getCanonicalFile().getParent());
 

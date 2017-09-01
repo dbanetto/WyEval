@@ -18,47 +18,13 @@ public class Breakdown {
 
     public WhileyFile breakdown() {
 
-        // search through find all while loops
-        for (WhileyFile.FunctionOrMethodOrProperty functionOrMethodOrProperty :
-                file.declarations(WhileyFile.FunctionOrMethodOrProperty.class)) {
-
-            // search through all bodies of code
-            breakdown(functionOrMethodOrProperty.statements);
+        for (Stmt.While whileStmt : Util.findLoops(file)) {
+            handleBreakdown(whileStmt);
         }
-
 
         return this.file;
     }
 
-
-    private void breakdown(List<Stmt> stmts) {
-        for (Stmt stmt: stmts) {
-            breakdown(stmt);
-        }
-    }
-    private void breakdown(Stmt stmt) {
-        if (stmt instanceof Stmt.While) {
-            Stmt.While whileStmt = (Stmt.While) stmt;
-
-            // then break up &&'s into separate invariant lines
-            handleBreakdown(whileStmt);
-
-            breakdown(whileStmt.body);
-        } else if (stmt instanceof Stmt.Switch) {
-            Stmt.Switch switchStmt = (Stmt.Switch) stmt;
-
-            for (Stmt.Case swCase : switchStmt.cases) {
-                breakdown(swCase.stmts);
-            }
-        } else if (stmt instanceof Stmt.IfElse) {
-            Stmt.IfElse ifElseStmt = (Stmt.IfElse) stmt;
-
-            breakdown(ifElseStmt.trueBranch);
-            if (ifElseStmt.falseBranch != null) {
-                breakdown(ifElseStmt.falseBranch);
-            }
-        }
-    }
 
     private void handleBreakdown(Stmt.While whileStmt) {
         List<Expr> exprs = new ArrayList<>(whileStmt.invariants);

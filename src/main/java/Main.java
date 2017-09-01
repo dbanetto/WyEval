@@ -74,8 +74,8 @@ public class Main {
     private static Options getOptions() {
         Options options = new Options();
 
-        options.addOption(Option.builder("count")
-                .desc("Count the number of loop invariants in the whole file")
+        options.addOption(Option.builder("report")
+                .desc("Report the number and kinds of loop invariants in the file")
                 .hasArg()
                 .build());
 

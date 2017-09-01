@@ -10,7 +10,6 @@ import wyc.lang.WhileyFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -29,7 +28,7 @@ public class Minimize {
 
     public WhileyFile minimize() {
 
-        List<Stmt.While> loops = findLoops();
+        List<Stmt.While> loops = Util.findLoops(file);
 
         List<LoopInvPair> pairs = pairLoopInvariant(loops);
         List<LoopInvPair> best = null;
@@ -82,7 +81,6 @@ public class Minimize {
         boolean result;
 
         try {
-            // TODO: customize the generate flag
             result = Whiley.compile(temp, true, generateLoopInv);
         } catch (IOException ex) {
             throw  ex;
@@ -105,48 +103,6 @@ public class Minimize {
         // apply all invariants to loops
         for (LoopInvPair pair : invs) {
             pair.loop.invariants.add(pair.invariant);
-        }
-    }
-
-    private List<Stmt.While> findLoops() {
-        List<Stmt.While> loops = new ArrayList<>();
-
-        // search through find all while loops
-        for (WhileyFile.FunctionOrMethodOrProperty functionOrMethodOrProperty :
-                file.declarations(WhileyFile.FunctionOrMethodOrProperty.class)) {
-
-            findLoops(functionOrMethodOrProperty.statements, loops);
-        }
-
-        return loops;
-    }
-
-    private void findLoops(List<Stmt> stmts, List<Stmt.While> loops) {
-        for (Stmt stmt: stmts) {
-            findLoops(stmt, loops);
-        }
-    }
-
-    private void findLoops(Stmt stmt, List<Stmt.While> loops) {
-        if (stmt instanceof Stmt.While) {
-            Stmt.While whileStmt = (Stmt.While) stmt;
-
-            loops.add(whileStmt);
-
-            findLoops(whileStmt.body, loops);
-        } else if (stmt instanceof Stmt.Switch) {
-            Stmt.Switch switchStmt = (Stmt.Switch) stmt;
-
-            for (Stmt.Case swCase : switchStmt.cases) {
-                findLoops(swCase.stmts, loops);
-            }
-        } else if (stmt instanceof Stmt.IfElse) {
-            Stmt.IfElse ifElseStmt = (Stmt.IfElse) stmt;
-
-            findLoops(ifElseStmt.trueBranch, loops);
-            if (ifElseStmt.falseBranch != null) {
-                findLoops(ifElseStmt.falseBranch, loops);
-            }
         }
     }
 
