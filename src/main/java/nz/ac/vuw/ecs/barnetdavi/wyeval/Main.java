@@ -1,3 +1,5 @@
+package nz.ac.vuw.ecs.barnetdavi.wyeval;
+
 import wyc.io.WhileyFilePrinter;
 import wyc.lang.WhileyFile;
 import org.apache.commons.cli.*;
@@ -19,6 +21,8 @@ public class Main {
             handleBreakdown(cmd);
         } else if (cmd.hasOption("minimize")) {
             handleMinimize(cmd);
+        } else if (cmd.hasOption("report")) {
+            handleReport(cmd);
         } else {
             new HelpFormatter().printHelp("eval", getOptions());
         }
@@ -71,6 +75,29 @@ public class Main {
         }
     }
 
+    private static void handleReport(CommandLine cmd) {
+        String file = cmd.getOptionValue("report");
+
+        OutputStream outputStream = System.out;
+
+        if (cmd.hasOption("o")) {
+            File outputFile = new File(cmd.getOptionValue("o"));
+            try {
+                outputStream = new FileOutputStream(outputFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.exit(2);
+            }
+        }
+
+        try {
+            report(file, cmd.hasOption("loopinv"), outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -80,7 +107,7 @@ public class Main {
                 .build());
 
         options.addOption(Option.builder("breakdown")
-                .desc("Breakdown loop invariants of given file")
+                .desc("nz.ac.vuw.ecs.barnetdavi.wyeval.Breakdown loop invariants of given file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder("o")
@@ -111,5 +138,10 @@ public class Main {
         for (WhileyFile file : Whiley.parse(path)) {
             new WhileyFilePrinter(result).print(new Minimize(file, generateLoopInv).minimize());
         }
+    }
+
+    private static void report(String path, boolean generateLoopInv, OutputStream result) throws IOException {
+        for (WhileyFile file : Whiley.parse(path))
+            new Report().report(file, generateLoopInv);
     }
 }
