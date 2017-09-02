@@ -12,6 +12,10 @@ import wyc.lang.Stmt;
 import wyc.lang.WhileyFile;
 
 import static nz.ac.vuw.ecs.barnetdavi.wyeval.Util.findLoops;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 public class Report {
@@ -33,7 +37,23 @@ public class Report {
             // first run the type system over the AST (required for generation)
             new FlowTypeChecker(new CompileTask(new StdProject())).propagate(file);
             // then generate the loop invariants
+
+            /// HACK: disables reporting from LoopInvariantGenerator to make dumping this report easier with UNIX  tools
+            // turn off STDOUT
+            PrintStream stdout = System.out;
+
+            // pipe
+            System.setOut(new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+
+                }
+            }));
+
             new LoopInvariantGenerator(file).generate();
+
+            // turn STDOUT back on
+            System.setOut(stdout);
         }
 
         for (Stmt.While  loop : loops) {
