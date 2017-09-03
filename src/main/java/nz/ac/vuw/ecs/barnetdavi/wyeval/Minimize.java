@@ -12,7 +12,8 @@ import wyc.lang.WhileyFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
   * Minimizes

@@ -3,7 +3,8 @@ package nz.ac.vuw.ecs.barnetdavi.wyeval;
 import wyc.lang.Stmt;
 import wyc.lang.WhileyFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Util {
 

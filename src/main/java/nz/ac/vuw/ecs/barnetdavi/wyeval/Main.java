@@ -1,8 +1,7 @@
 package nz.ac.vuw.ecs.barnetdavi.wyeval;
 
-import wyc.io.WhileyFilePrinter;
-import wyc.lang.WhileyFile;
 import org.apache.commons.cli.*;
+import wyc.io.WhileyFilePrinter;
 
 import java.io.*;
 
@@ -23,6 +22,8 @@ public class Main {
             handleMinimize(cmd);
         } else if (cmd.hasOption("report")) {
             handleReport(cmd);
+        } else if (cmd.hasOption("check")) {
+            handleCheck(cmd);
         } else {
             new HelpFormatter().printHelp("eval", getOptions());
         }
@@ -98,6 +99,20 @@ public class Main {
         }
     }
 
+    private static void handleCheck(CommandLine cmd) {
+        String file = cmd.getOptionValue("check");
+
+        try {
+            boolean success = Whiley.compile(file, true, false);
+            if (!success) {
+                System.exit(-1);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -110,13 +125,19 @@ public class Main {
                 .desc("Breakdown loop invariants of given file")
                 .hasArg()
                 .build());
-        options.addOption(Option.builder("o")
-                .desc("Output of the operation")
-                .hasArg()
-                .build());
 
         options.addOption(Option.builder("minimize")
                 .desc("Minimizes the loop invariants of given file")
+                .hasArg()
+                .build());
+
+        options.addOption(Option.builder("check")
+                .desc("Checks if a given file will compile or not")
+                .hasArg()
+                .build());
+
+        options.addOption(Option.builder("o")
+                .desc("Output of the operation")
                 .hasArg()
                 .build());
 
@@ -128,20 +149,15 @@ public class Main {
     }
 
     private static void breakdown(String path, OutputStream result) throws IOException {
-        for (WhileyFile file : Whiley.parse(path)) {
-            new WhileyFilePrinter(result).print(new Breakdown(file).breakdown());
-        }
+        new WhileyFilePrinter(result).print(new Breakdown(Whiley.parse(path)).breakdown());
     }
 
 
     private static void minimize(String path, boolean generateLoopInv, OutputStream result) throws IOException {
-        for (WhileyFile file : Whiley.parse(path)) {
-            new WhileyFilePrinter(result).print(new Minimize(file, generateLoopInv).minimize());
-        }
+            new WhileyFilePrinter(result).print(new Minimize(Whiley.parse(path), generateLoopInv).minimize());
     }
 
     private static void report(String path, boolean generateLoopInv, OutputStream result) throws IOException {
-        for (WhileyFile file : Whiley.parse(path))
-            new Report().report(file, generateLoopInv);
+        new Report().report(Whiley.parse(path), generateLoopInv);
     }
 }

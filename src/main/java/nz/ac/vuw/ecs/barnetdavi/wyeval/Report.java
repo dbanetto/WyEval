@@ -1,7 +1,5 @@
 package nz.ac.vuw.ecs.barnetdavi.wyeval;
 
-import wybs.lang.Attribute;
-import wybs.lang.Build;
 import wybs.util.StdProject;
 import wyc.builder.CompileTask;
 import wyc.builder.FlowTypeChecker;
@@ -11,12 +9,15 @@ import wyc.lang.Expr;
 import wyc.lang.Stmt;
 import wyc.lang.WhileyFile;
 
-import static nz.ac.vuw.ecs.barnetdavi.wyeval.Util.findLoops;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static nz.ac.vuw.ecs.barnetdavi.wyeval.Util.findLoops;
 
 public class Report {
 

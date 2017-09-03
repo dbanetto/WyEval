@@ -8,14 +8,14 @@ import wyfs.lang.Path;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 /**
  * Interface to compile and parse whiley files
  */
 public class Whiley {
 
-    public static List<WhileyFile> parse(String path) throws IOException {
+    public static WhileyFile parse(String path) throws IOException {
 
         File whileyfile = new File(path);
         File whileydir = new File(whileyfile.getCanonicalFile().getParent());
@@ -29,14 +29,13 @@ public class Whiley {
 
         // Gets the entries to be formatted
         List<Path.Entry<WhileyFile>> entries = cmd.getModifiedSourceFiles();
-        List<WhileyFile> whileyFiles = new ArrayList<>(entries.size());
         for (Path.Entry<WhileyFile> entry : entries) {
             if (entry.location().equals(whileyfile.getAbsolutePath())) {
-                whileyFiles.add(WhileyFile.ContentType.read(entry, null));
+                return WhileyFile.ContentType.read(entry, null);
             }
         }
 
-        return whileyFiles;
+        throw new RuntimeException("Could not find " + whileyfile);
     }
 
     public static boolean compile(String path, boolean verify, boolean generateLoopInv) throws IOException {

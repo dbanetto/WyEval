@@ -4,7 +4,8 @@ import wyc.lang.Expr;
 import wyc.lang.Stmt;
 import wyc.lang.WhileyFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Breaks down the loop invariants by separating conjunctive conditions
