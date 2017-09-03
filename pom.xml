@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.github.zyphrus</groupId>
             <artifactId>WhileyCompiler</artifactId>
-            <version>49e40724b26a90e48fdd8a6f93f89f9d9251f2e6</version>
+            <version>dddde08086d4507c8b49b56f9870b59aeafe6774</version>
         </dependency>
        <dependency>
            <groupId>commons-cli</groupId>

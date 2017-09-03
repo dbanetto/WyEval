@@ -2,6 +2,7 @@ package nz.ac.vuw.ecs.barnetdavi.wyeval;
 
 import org.apache.commons.cli.*;
 import wyc.io.WhileyFilePrinter;
+import wyc.lang.WhileyFile;
 
 import java.io.*;
 
@@ -20,8 +21,6 @@ public class Main {
             handleBreakdown(cmd);
         } else if (cmd.hasOption("minimize")) {
             handleMinimize(cmd);
-        } else if (cmd.hasOption("report")) {
-            handleReport(cmd);
         } else if (cmd.hasOption("check")) {
             handleCheck(cmd);
         } else {
@@ -56,43 +55,26 @@ public class Main {
     private static void handleMinimize(CommandLine cmd) {
         String file = cmd.getOptionValue("minimize");
 
-        OutputStream outputStream = System.out;
+        OutputStream outputStream = null;
 
         if (cmd.hasOption("o")) {
-            File outputFile = new File(cmd.getOptionValue("o"));
-            try {
-                outputStream = new FileOutputStream(outputFile);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                System.exit(2);
+
+            String path = cmd.getOptionValue("o");
+            if (path == null) {
+                outputStream = System.out;
+            } else {
+                File outputFile = new File(path);
+                try {
+                    outputStream = new FileOutputStream(outputFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.exit(2);
+                }
             }
         }
 
         try {
             minimize(file, cmd.hasOption("loopinv"), outputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    private static void handleReport(CommandLine cmd) {
-        String file = cmd.getOptionValue("report");
-
-        OutputStream outputStream = System.out;
-
-        if (cmd.hasOption("o")) {
-            File outputFile = new File(cmd.getOptionValue("o"));
-            try {
-                outputStream = new FileOutputStream(outputFile);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                System.exit(2);
-            }
-        }
-
-        try {
-            report(file, cmd.hasOption("loopinv"), outputStream);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -116,18 +98,13 @@ public class Main {
     private static Options getOptions() {
         Options options = new Options();
 
-        options.addOption(Option.builder("report")
-                .desc("Report the number and kinds of loop invariants in the file")
-                .hasArg()
-                .build());
-
         options.addOption(Option.builder("breakdown")
                 .desc("Breakdown loop invariants of given file")
                 .hasArg()
                 .build());
 
         options.addOption(Option.builder("minimize")
-                .desc("Minimizes the loop invariants of given file")
+                .desc("Minimizes the loop invariants of given file and reports on loop invariants")
                 .hasArg()
                 .build());
 
@@ -154,10 +131,9 @@ public class Main {
 
 
     private static void minimize(String path, boolean generateLoopInv, OutputStream result) throws IOException {
-            new WhileyFilePrinter(result).print(new Minimize(Whiley.parse(path), generateLoopInv).minimize());
-    }
-
-    private static void report(String path, boolean generateLoopInv, OutputStream result) throws IOException {
-        new Report().report(Whiley.parse(path), generateLoopInv);
+        WhileyFile file = new Minimize(Whiley.parse(path), generateLoopInv).minimize();
+        if (result != null) {
+            new WhileyFilePrinter(result).print(file);
+        }
     }
 }

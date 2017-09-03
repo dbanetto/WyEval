@@ -34,29 +34,6 @@ public class Report {
 
         List<ReportData> reports = new ArrayList<>();
 
-        if (generateLoopInv) {
-            // first run the type system over the AST (required for generation)
-            new FlowTypeChecker(new CompileTask(new StdProject())).propagate(file);
-            // then generate the loop invariants
-
-            /// HACK: disables reporting from LoopInvariantGenerator to make dumping this report easier with UNIX  tools
-            // turn off STDOUT
-            PrintStream stdout = System.out;
-
-            // pipe
-            System.setOut(new PrintStream(new OutputStream() {
-                @Override
-                public void write(int b) throws IOException {
-
-                }
-            }));
-
-            new LoopInvariantGenerator(file).generate();
-
-            // turn STDOUT back on
-            System.setOut(stdout);
-        }
-
         for (Stmt.While  loop : loops) {
             ReportData entry = new ReportData();
 
@@ -120,5 +97,4 @@ public class Report {
                     '}';
         }
     }
-
 }

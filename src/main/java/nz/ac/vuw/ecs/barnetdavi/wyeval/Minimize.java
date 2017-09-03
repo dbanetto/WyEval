@@ -4,6 +4,7 @@ import org.paukov.combinatorics.CombinatoricsVector;
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
 import org.paukov.combinatorics.ICombinatoricsVector;
+import wyc.builder.CompileTask;
 import wyc.io.WhileyFilePrinter;
 import wyc.lang.Expr;
 import wyc.lang.Stmt;
@@ -34,12 +35,13 @@ public class Minimize {
 
         List<LoopInvPair> pairs = pairLoopInvariant(loops);
         List<LoopInvPair> best = null;
+        int count = 0;
 
         round: for (int round = 0; round <= pairs.size(); round++ ) {
             CombinatoricsVector<LoopInvPair> pairsCombo = new CombinatoricsVector<>(pairs);
             Generator<LoopInvPair> combos = Factory.createSimpleCombinationGenerator(pairsCombo, round);
 
-            System.out.println("Testing combinations of  " + round);
+            System.err.println("Testing combinations of  " + round);
 
             for (ICombinatoricsVector<LoopInvPair> selected : combos) {
 
@@ -49,6 +51,7 @@ public class Minimize {
 
                 // test program
                 try {
+                    count += 1;
                     if (compile()) {
                         // first combination to work is the minimum set of invariants required
                         best = candidate;
@@ -61,8 +64,12 @@ public class Minimize {
             }
         }
 
+        System.err.println("Attempted " + count + " combination(s)");
+
         if (best != null) {
-            setInvariants(loops, best);
+            // setInvariants(loops, best);
+
+            new Report().report(CompileTask.cachedWhileyFile, generateLoopInv);
         } else {
             throw new RuntimeException("Did not find a valid combination of invariants");
         }
