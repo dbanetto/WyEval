@@ -107,7 +107,7 @@ public class Main {
                 .build());
 
         options.addOption(Option.builder("breakdown")
-                .desc("nz.ac.vuw.ecs.barnetdavi.wyeval.Breakdown loop invariants of given file")
+                .desc("Breakdown loop invariants of given file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder("o")
