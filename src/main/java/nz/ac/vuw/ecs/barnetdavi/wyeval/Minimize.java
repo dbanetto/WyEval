@@ -23,10 +23,12 @@ public class Minimize {
 
     private final WhileyFile file;
     private final boolean generateLoopInv;
+    private final String name;
 
-    public Minimize(WhileyFile file, boolean generateLoopInv ) {
+    public Minimize(WhileyFile file, boolean generateLoopInv, String name) {
        this.file = file;
        this.generateLoopInv = generateLoopInv;
+       this.name = name;
     }
 
     public WhileyFile minimize() {
@@ -69,7 +71,7 @@ public class Minimize {
         if (best != null) {
             // setInvariants(loops, best);
 
-            new Report().report(CompileTask.cachedWhileyFile, generateLoopInv);
+            new Report().report(CompileTask.cachedWhileyFile, generateLoopInv, name);
         } else {
             throw new RuntimeException("Did not find a valid combination of invariants");
         }
@@ -87,12 +89,12 @@ public class Minimize {
         fileSteam.close();
 
         // compile with given flags
-        boolean result;
+        boolean result = false;
 
         try {
-            result = Whiley.compile(temp, true, generateLoopInv);
-        } catch (IOException ex) {
-            throw  ex;
+            result = Whiley.compile(temp, true, generateLoopInv, false);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         } finally {
             // clean up
             new File(temp.getParent(), temp.getName().replace(".whiley", ".wyal")).delete();

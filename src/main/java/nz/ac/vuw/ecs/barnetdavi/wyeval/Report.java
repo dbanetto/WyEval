@@ -9,9 +9,6 @@ import wyc.lang.Expr;
 import wyc.lang.Stmt;
 import wyc.lang.WhileyFile;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,12 +18,40 @@ import static nz.ac.vuw.ecs.barnetdavi.wyeval.Util.findLoops;
 
 public class Report {
 
-    public void report(WhileyFile file, boolean generateLoopInv) {
+    private static final String STARTING_BOUND = "starting bound";
+    private static final String AGED_LOOP = "aged loop";
+    private static final String ARRAY_INIT = "array init";
+    private static final String ARRAY_COPY = "array copy";
 
-        List<ReportData> data = generateReport(file, generateLoopInv);
+    private static final String[] keys = new String[] {
+            STARTING_BOUND,
+            ARRAY_COPY,
+            AGED_LOOP,
+            ARRAY_INIT
+    };
+
+    public void report(WhileyFile file, boolean generateLoopInv, String name) {
+
+        List<ReportData> reports = generateReport(file, generateLoopInv);
 
         // print data
-        System.out.println(data);
+        for (ReportData data : reports) {
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(name).append(',');
+            builder.append(data.grandTotal()).append(',');
+            builder.append(data.sourceInvariants).append(',');
+            builder.append(data.totalGeneratedInvariants()).append(',');
+
+            for (String key : keys) {
+                builder.append(data.generatedInvariants.getOrDefault(key, 0))
+                        .append(',');
+            }
+
+            builder.append(generateLoopInv ? "gen" : "min");
+
+            System.out.println(builder);
+        }
     }
 
     private List<ReportData> generateReport(WhileyFile file, boolean generateLoopInv) {
@@ -63,13 +88,13 @@ public class Report {
 
             // normalize key
             if (key.contains("starting boundary")) {
-                key = "starting bound";
+                key = STARTING_BOUND;
             } else if (key.contains("aged loop")) {
-                key = "aged loop";
+                key = AGED_LOOP;
             } else if (key.contains("elements are predictability")) {
-                key = "array init";
+                key = ARRAY_INIT;
             } else if (key.contains("length equal to another array")) {
-                key = "array copy";
+                key = ARRAY_COPY;
             }
 
             // update entry

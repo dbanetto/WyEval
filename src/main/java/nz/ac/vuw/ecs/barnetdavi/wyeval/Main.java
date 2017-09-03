@@ -85,7 +85,7 @@ public class Main {
         String file = cmd.getOptionValue("check");
 
         try {
-            boolean success = Whiley.compile(file, true, false);
+            boolean success = Whiley.compile(file, true, false, true);
             if (!success) {
                 System.exit(-1);
             }
@@ -131,7 +131,9 @@ public class Main {
 
 
     private static void minimize(String path, boolean generateLoopInv, OutputStream result) throws IOException {
-        WhileyFile file = new Minimize(Whiley.parse(path), generateLoopInv).minimize();
+        WhileyFile file = new Minimize(Whiley.parse(path), generateLoopInv,
+                new File(path).getName().replace(".whiley", ""))
+                .minimize();
         if (result != null) {
             new WhileyFilePrinter(result).print(file);
         }

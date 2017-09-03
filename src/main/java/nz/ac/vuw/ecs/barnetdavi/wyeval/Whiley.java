@@ -40,11 +40,11 @@ public class Whiley {
         throw new RuntimeException("Could not find " + whileyfile);
     }
 
-    public static boolean compile(String path, boolean verify, boolean generateLoopInv) throws IOException {
-       return compile(new File(path), verify, generateLoopInv);
+    public static boolean compile(String path, boolean verify, boolean generateLoopInv, boolean verbose) throws IOException {
+       return compile(new File(path), verify, generateLoopInv, verbose);
     }
 
-    public static boolean compile(File whileyfile, boolean verify, boolean generateLoopInv) throws IOException {
+    public static boolean compile(File whileyfile, boolean verify, boolean generateLoopInv, boolean verbose) throws IOException {
         File whileydir = new File(whileyfile.getCanonicalFile().getParent());
 
         Content.Registry registry = new wyc.Activator.Registry();
@@ -52,17 +52,22 @@ public class Whiley {
         PrintStream stdout = System.out;
         PrintStream stderr = System.err;
 
-        PrintStream devnull = new PrintStream(new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
+        PrintStream out = stdout;
+        PrintStream err = stderr;
 
-            }
-        });
+        if (!verbose) {
+            out = new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException { }
+            });
 
-        System.setOut(devnull);
-        System.setErr(devnull);
+            err = out;
+        }
 
-        Compile cmd = new Compile(registry, Logger.NULL, devnull, devnull);
+        System.setOut(out);
+        System.setErr(err);
+
+        Compile cmd = new Compile(registry, Logger.NULL, out, err);
         cmd.setWhileydir(whileydir);
         cmd.setWyaldir(whileydir);
         cmd.setWyildir(whileydir);
@@ -75,6 +80,7 @@ public class Whiley {
 
             return result == Compile.Result.SUCCESS;
         } catch (Exception e) {
+            System.exit(-1);
             throw e;
         } finally {
             System.setOut(stdout);
