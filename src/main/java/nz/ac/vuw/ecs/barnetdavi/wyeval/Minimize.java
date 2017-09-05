@@ -39,6 +39,10 @@ public class Minimize {
         List<LoopInvPair> best = null;
         int count = 0;
 
+        if (!generateLoopInv) {
+            new Report(true).report(file, false, name);
+        }
+
         round: for (int round = 0; round <= pairs.size(); round++ ) {
             CombinatoricsVector<LoopInvPair> pairsCombo = new CombinatoricsVector<>(pairs);
             Generator<LoopInvPair> combos = Factory.createSimpleCombinationGenerator(pairsCombo, round);

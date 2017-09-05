@@ -32,7 +32,7 @@ public class Whiley {
         // Gets the entries to be formatted
         List<Path.Entry<WhileyFile>> entries = cmd.getModifiedSourceFiles();
         for (Path.Entry<WhileyFile> entry : entries) {
-            if (entry.location().equals(whileyfile.getAbsolutePath())) {
+            if (entry.location().equals(whileyfile.getCanonicalPath())) {
                 return WhileyFile.ContentType.read(entry, null);
             }
         }

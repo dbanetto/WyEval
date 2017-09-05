@@ -23,6 +23,17 @@ public class Report {
     private static final String ARRAY_INIT = "array init";
     private static final String ARRAY_COPY = "array copy";
 
+    private final boolean isControl;
+
+    public Report() {
+        this.isControl = false;
+    }
+
+    public Report(boolean isControl) {
+        this.isControl = isControl;
+    }
+
+
     private static final String[] keys = new String[] {
             STARTING_BOUND,
             ARRAY_COPY,
@@ -32,7 +43,7 @@ public class Report {
 
     public void report(WhileyFile file, boolean generateLoopInv, String name) {
 
-        List<ReportData> reports = generateReport(file, generateLoopInv);
+        List<ReportData> reports = generateReport(file);
 
         // print data
         for (ReportData data : reports) {
@@ -48,13 +59,17 @@ public class Report {
                         .append(',');
             }
 
-            builder.append(generateLoopInv ? "gen" : "min");
+            if (isControl) {
+                builder.append("control");
+            } else {
+                builder.append(generateLoopInv ? "gen" : "min");
+            }
 
             System.out.println(builder);
         }
     }
 
-    private List<ReportData> generateReport(WhileyFile file, boolean generateLoopInv) {
+    private List<ReportData> generateReport(WhileyFile file) {
         List<Stmt.While> loops = findLoops(file);
 
         List<ReportData> reports = new ArrayList<>();

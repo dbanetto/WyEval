@@ -50,6 +50,14 @@ public class Main {
             e.printStackTrace();
             System.exit(1);
         }
+
+
+        try {
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void handleMinimize(CommandLine cmd) {
@@ -78,6 +86,15 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
+        }
+
+        if (outputStream != null) {
+            try {
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
