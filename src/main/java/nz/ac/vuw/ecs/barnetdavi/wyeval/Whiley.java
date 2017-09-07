@@ -80,6 +80,10 @@ public class Whiley {
 
             return result == Compile.Result.SUCCESS;
         } catch (Exception e) {
+            System.setOut(stdout);
+            System.setErr(stderr);
+
+            e.printStackTrace();
             System.exit(-1);
             throw e;
         } finally {
